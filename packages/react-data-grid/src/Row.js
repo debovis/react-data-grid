@@ -81,8 +81,12 @@ const Row = React.createClass({
   getCell(column, i, selectedColumn) {
     let CellRenderer = this.props.cellRenderer;
     const { colVisibleStart, colVisibleEnd, idx, cellMetaData } = this.props;
-    const { key, formatter, locked } = column;
-    const baseCellProps = { key: `${key}-${idx}`, idx: i, rowIdx: idx, height: this.getRowHeight(), column, cellMetaData };
+    const { key, formatter, locked, subKey } = column;
+    const keyValue = subKey !== undefined ? "${this.key}-${this.subKey}-${this.idx}" : "${this.key}-${this.idx}";
+    const column_copy = JSON.parse(JSON.stringify(column));
+    column_copy.idx = idx;
+    const keyFormatter = new Function('return `' + keyValue + '`;').call(column_copy);
+    const baseCellProps = { key: keyFormatter, idx: i, rowIdx: idx, height: this.getRowHeight(), column, cellMetaData };
 
     if ((i < colVisibleStart || i > colVisibleEnd) && !locked) {
       return <OverflowCell ref={(node) => this[key] = node} {...baseCellProps} />;
@@ -91,7 +95,7 @@ const Row = React.createClass({
     const { row, isSelected } = this.props;
     const cellProps = {
       ref: (node) => this[key] = node,
-      value: this.getCellValue(key || i),
+      value: this.getCellValue(key || i, subKey),
       rowData: row,
       isRowSelected: isSelected,
       expandableOptions: this.getExpandableOptions(key),
@@ -136,7 +140,7 @@ const Row = React.createClass({
     return this.props.height;
   },
 
-  getCellValue(key) {
+  getCellValue(key, subKey) {
     let val;
     if (key === 'select-row') {
       return this.props.isSelected;
@@ -144,6 +148,9 @@ const Row = React.createClass({
       val = this.props.row.get(key);
     } else {
       val = this.props.row[key];
+      if(val instanceof Array){
+        val = val[0][subKey];
+      }
     }
     return val;
   },

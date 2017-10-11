@@ -8,7 +8,9 @@ const Example = React.createClass({
     this._columns = [
       { key: 'id', name: 'ID' },
       { key: 'title', name: 'Title' },
-      { key: 'count', name: 'Count' } ];
+      { key: 'count', name: 'Count' },
+      { key: 'thing',subKey: 'j', name: 'thing' }
+    ];
 
     return null;
   },
@@ -19,7 +21,8 @@ const Example = React.createClass({
       rows.push({
         id: i,
         title: 'Title ' + i,
-        count: i * 1000
+        count: i * 1000,
+        thing: [{j:1}]
       });
     }
 
